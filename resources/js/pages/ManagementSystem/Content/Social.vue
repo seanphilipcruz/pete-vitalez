@@ -1,6 +1,6 @@
 <template>
     <div class="row mb-3">
-        <div class="col-12">
+        <div class="col-12" v-if="!loading">
             <div class="row mb-3">
                 <div class="col-12">
                     <button class="btn btn-outline-dark float-end" data-bs-target="#add-social" data-bs-toggle="modal">
@@ -34,16 +34,21 @@
                     </div>
                 </div>
             </div>
+            <add-social-modal :refresh="getSocials"></add-social-modal>
+            <update-social :refresh="getSocials" :social="social" :order_count="order_count"></update-social>
         </div>
-        <add-social-modal :refresh="getSocials"></add-social-modal>
-        <update-social :refresh="getSocials" :social="social"></update-social>
+        <div class="col-12 text-center" v-else>
+            <div class="spinner-border text-dark" role="status">
+                <span class="visually-hidden">Loading ...</span>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import { GET_SOCIALS, GET_SOCIAL } from "../../../store/types/content";
-import AddSocialModal from "../../../components/Modals/AddSocialModal";
-import UpdateSocial from "../../../components/Modals/UpdateSocialModal";
+import AddSocialModal from "../../../components/Modals/AddSocial";
+import UpdateSocial from "../../../components/Modals/UpdateSocial";
 
 export default {
     components: {
@@ -52,16 +57,22 @@ export default {
     },
 
     data() {
-        return {}
+        return {
+            loading: false,
+        }
     },
 
     methods: {
         async getSocials() {
+            this.loading = true;
+
             try {
                 const response = await this.$store.dispatch(GET_SOCIALS);
             } catch (error) {
                 throw error;
             }
+
+            this.loading = false;
         },
 
         async getSocial(social) {
@@ -80,6 +91,10 @@ export default {
 
         social() {
             return this.$store.state.content.social;
+        },
+
+        order_count() {
+            return this.socials.length;
         }
     },
 

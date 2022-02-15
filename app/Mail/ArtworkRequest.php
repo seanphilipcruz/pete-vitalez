@@ -30,6 +30,7 @@ class ArtworkRequest extends Mailable
      */
     public function build()
     {
-        return $this->subject('Custom Artwork Request for '.$this->request_details->Product->title)->view('email.custom');
+        return $this->subject('Custom Artwork Request for '.$this->request_details->Product->title)
+            ->view('email.custom');
     }
 }

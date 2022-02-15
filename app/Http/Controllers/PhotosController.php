@@ -10,26 +10,26 @@ use Illuminate\Support\Facades\Validator;
 
 class PhotosController extends Controller
 {
-    public function index() {
+    public function index(Request $request) {
 
     }
 
     public function store(Request $request) {
         $validator = Validator::make($request->all(), [
+            'type' => 'required',
             'title' => 'min:4|required',
             'description' => 'required',
             'image' => 'image|max:2048|required',
-            'date_taken' => 'required'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'status' => 'success',
+                'status' => 'error',
                 'message' => $validator->errors()->all()
-            ]);
+            ], 400);
         }
 
-        $photo = new Photo($validator->validated());
+        $photo = new Photo($request->all());
 
         $product_id = $request->input('product_id');
         $blog_id = $request->input('blog_id');
@@ -62,19 +62,18 @@ class PhotosController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'min:4|required',
             'description' => 'required',
-            'date_taken' => 'required'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'status' => 'success',
+                'status' => 'error',
                 'message' => $validator->errors()->all()
-            ]);
+            ], 400);
         }
 
         $photo = Photo::with('Blog', 'Product')->findOrFail($id);
 
-        $photo->update($validator->validated());
+        $photo->update($request->all());
 
         return response()->json([
             'status' => 'success',

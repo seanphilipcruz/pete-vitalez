@@ -16,7 +16,6 @@ class Photo extends Model
         'title',
         'description',
         'image',
-        'date_taken'
     ];
 
     public function Product() {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\ArtworkRequest;
 use App\Mail\OrderInformation;
+use App\Mail\OrderStatus;
 use App\Mail\ProductInvoice;
 use App\Models\Blog;
 use App\Models\JobOrder;
@@ -28,23 +29,36 @@ class Controller extends BaseController
         $image = $request->file('image');
         $type = $request->get('type');
 
-        $image_name = ($type === 'artwork' ? 'artwork' : 'blog') . '-' . date('Ymd') . '-' . mt_rand() . '.jpg';
+        // check if the type is artwork or artwork photo else it would fall into being named as blog
+        $image_name = ($type === 'artwork' || $type === 'artwork_photo' ? 'artwork' : ($type === 'blog' || $type === 'blog_photo' ? 'blog' : 'about')) . '-' . date('Ymd') . '-' . mt_rand() . '.png';
+
+        $path = 'images';
 
         if ($type) {
-            if ($type === 'artwork') {
+            if ($type === 'artwork' || $type === 'artwork_photo') {
                 $path = 'images/artworks';
-            } else {
+            } else if ($type === 'blogs' || $type === 'blog_photo') {
                 $path = 'images/blogs';
+            } else if ($type === 'about') {
+                $path = 'assets/about';
             }
-        } else {
-            $path = 'images';
         }
 
         $image->move($path, $image_name);
 
-        $file = 'images/' . ($type === 'artwork' ? 'artworks' : 'blogs') . '/' . $image_name;
-
-        Storage::disk($type)->put($image_name, file_get_contents($file));
+        if ($type === 'artwork_photo') {
+            $file = 'images/artworks/' . $image_name;
+            Storage::disk('artwork')->put($image_name, file_get_contents($file));
+        } else if ($type === 'blog_photo') {
+            $file = 'images/blogs/' . $image_name;
+            Storage::disk('blog')->put($image_name, file_get_contents($file));
+        } else if ($type === 'about') {
+            $file = 'assets/about/' . $image_name;
+            Storage::disk($type)->put($image_name, file_get_contents($file));
+        } else {
+            $file = 'images/' . ($type === 'artwork' ? 'artworks' : 'blogs') . '/' . $image_name;
+            Storage::disk($type)->put($image_name, file_get_contents($file));
+        }
 
         return response()->json([
             'status' => 'success',
@@ -57,14 +71,13 @@ class Controller extends BaseController
         $validator = Validator::make($request->all(), [
             'first_name' => 'min:2|required',
             'last_name' => 'min:2|required',
-            'email' => 'email|required',
             'country_code' => 'required',
             'phone_number' => 'required',
             'address' => 'required',
-            'zip_code' => 'required',
             'city' => 'required',
             'state' => 'required',
-            'code' => 'max:2|required'
+            'code' => 'max:2|required',
+            'is_framed' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -157,6 +170,23 @@ class Controller extends BaseController
             'unread' => $unread,
             'read' => $read
         ]);
+    }
+
+    public function send_order_update($status) {
+        $status['order']->Product->image = $this->verify_photo($status['order']->Product->image, 'artwork');
+
+        if (!$status['order']->Customer->middle_name) {
+            $status['order']->Customer->full_name = $status['order']->Customer->first_name . ' ' . $status['order']->Customer->last_name;
+        } else {
+            $status['order']->Customer->full_name = $status['order']->Customer->first_name . ' ' . $status['order']->Customer->middle_name . ' ' . $status['order']->Customer->last_name;
+        }
+
+        $status['order']->Customer->complete_address = $status['order']->Customer->address . ' ' . $status['order']->Customer->city . ',' . ' ' . $status['order']->Customer->state . ' ' . $status['order']->Customer->country . ',' . ' ' . $status['order']->Customer->zip_code;
+
+
+        Mail::to([$status['order']->Customer->email])->send(new OrderStatus($status));
+
+        return true;
     }
 
     public function send_invoice($invoice) {

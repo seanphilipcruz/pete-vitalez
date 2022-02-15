@@ -1,6 +1,6 @@
 <template>
       <div class="row mb-3">
-          <div class="col-12">
+          <div class="col-12" v-if="!loading">
               <div class="row mb-3">
                   <div class="col-12">
                       <button class="btn btn-outline-dark float-end" data-bs-target="#add-event" data-bs-toggle="modal">
@@ -48,12 +48,17 @@
               <add-event :refresh="getEvents"></add-event>
               <update-event :refresh="getEvents" :event="event"></update-event>
           </div>
+          <div class="col-12 text-center" v-else>
+              <div class="spinner-border text-dark" role="status">
+                  <span class="visually-hidden">Loading ...</span>
+              </div>
+          </div>
       </div>
 </template>
 
 <script>
 import { GET_EVENTS, GET_EVENT, DELETE_EVENT } from "../../../store/types/content";
-import AddEvent from "../../../components/Modals/AddEventModal";
+import AddEvent from "../../../components/Modals/AddEvent";
 import UpdateEvent from "../../../components/Modals/UpdateEvent";
 
 export default {
@@ -62,13 +67,23 @@ export default {
         AddEvent
     },
 
+    data() {
+        return {
+            loading: false,
+        }
+    },
+
     methods: {
         async getEvents() {
+            this.loading = true;
+
             try {
                 const response = await this.$store.dispatch(GET_EVENTS);
             } catch (error) {
                 throw error;
             }
+
+            this.loading = false;
         },
 
         async getEvent(event) {

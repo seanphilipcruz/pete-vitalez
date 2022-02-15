@@ -102,7 +102,7 @@
 import { DELETE_REQUEST, GET_REQUEST, GET_REQUESTS } from "../../store/types/artworks";
 import SelectData from "../SelectData";
 import SearchBar from "../SearchBar";
-import ViewRequestModal from "../Modals/ViewRequestModal";
+import ViewRequestModal from "../Modals/OpenRequest";
 import utilHelper from "../../helpers/utl";
 
 export default {

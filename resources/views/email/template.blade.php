@@ -357,28 +357,34 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>{{ $invoice['order']->Product->title }}</td>
-                            <td class="text-end">{{ $invoice['order']->Product->price }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col"></div>
-            <div class="col-4">
-                <table class="table table-hover table-borderless">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="text-end">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="text-end">{{ $invoice['order']->total }}</td>
-                        </tr>
+                        @if($invoice['order']->is_framed === 1)
+                            <tr>
+                                <td>1</td>
+                                <td>{{ $invoice['order']->Product->title }}</td>
+                                <td class="text-end">{{ $invoice['order']->Product->price }}</td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>Frame</td>
+                                <td class="text-end">{{ $invoice['order']->Product->frame_price }}</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="fw-bold">Total</td>
+                                <td class="text-end">{{ $invoice['order']->Product->price + $invoice['order']->Product->frame_price }}</td>
+                            </tr>
+                        @else
+                            <tr>
+                                <td>1</td>
+                                <td>{{ $invoice['order']->Product->title }}</td>
+                                <td class="text-end">{{ $invoice['order']->Product->price }}</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="fw-bold">Total</td>
+                                <td class="text-end">{{ $invoice['order']->Product->price + $invoice['order']->Product->frame_price }}</td>
+                            </tr>
+                        @endif
                     </tbody>
                 </table>
             </div>
@@ -389,6 +395,7 @@
                     {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(250)->generate(route('website.verify.invoice', $invoice['order']->code)) !!}
                     <div class="my-3">
                         This serves as your official receipt, thank you for supporting The Art of Pete Vitalez!
+                        <br>
                         (This is a system generated message)
                     </div>
                 </div>

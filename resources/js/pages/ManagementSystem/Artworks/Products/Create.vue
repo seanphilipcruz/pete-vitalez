@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import CreateForm from "../../../../components/Artworks/CreateForm";
+import CreateForm from "../../../../components/Forms/Artworks/Create";
 
 export default {
     metaInfo() {

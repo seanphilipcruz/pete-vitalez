@@ -16,6 +16,8 @@ class WebsiteContentController extends Controller
         if ($contact > 0) {
             $contact_info = Contact::whereNull('deleted_at')->latest()->first();
 
+            $contact_info->image = $this->verify_photo($contact_info->image, 'about');
+
             return response()->json($contact_info);
         }
 
@@ -29,6 +31,7 @@ class WebsiteContentController extends Controller
             'email' => 'email|required',
             'contact_number' => 'min:11|required',
             'description' => 'required',
+            'image' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -38,7 +41,7 @@ class WebsiteContentController extends Controller
             ], 400);
         }
 
-        $contact = new Contact($validator->validated());
+        $contact = new Contact($validator->all());
         $contact->save();
 
         return response()->json([
@@ -66,10 +69,28 @@ class WebsiteContentController extends Controller
 
             foreach ($events as $event) {
                 if ($event->start && $event->end) {
-                    $event->start = date('F d, Y', strtotime($event->start));
-                    $event->end = date('F d, Y', strtotime($event->end));
+                    $year_start = date('Y', strtotime($event->start));
+                    $year_end = date('Y', strtotime($event->end));
+
+                    $month_start = date('m', strtotime($event->start));
+                    $month_end = date('m', strtotime($event->end));
+
+                    if ($month_start === $month_end && $year_start === $year_end) {
+                        $event->start = date('M d', strtotime($event->start));
+                        $event->end = date('d, Y', strtotime($event->end));
+                    }
+
+                    if ($month_start !== $month_end && $year_start === $year_end) {
+                        $event->start = date('M d', strtotime($event->start));
+                        $event->end = date('M d, Y', strtotime($event->end));
+                    }
+
+                    if ($year_start !== $year_end) {
+                        $event->start = date('M d, Y', strtotime($event->start));
+                        $event->end = date('M d, Y', strtotime($event->end));
+                    }
                 } elseif ($event->start) {
-                    $event->start = date('F d, Y', strtotime($event->start));
+                    $event->start = date('M d, Y', strtotime($event->start));
                 }
             }
 
@@ -133,7 +154,9 @@ class WebsiteContentController extends Controller
         $socials = Social::latest()->count();
 
         if ($socials > 0) {
-            $socials = Social::whereNull('deleted_at')->get();
+            $socials = Social::whereNull('deleted_at')
+                ->orderBy('order')
+                ->get();
 
             return response()->json($socials);
         }
@@ -160,7 +183,7 @@ class WebsiteContentController extends Controller
             ], 400);
         }
 
-        $social = new Social($validator->validated());
+        $social = new Social($request->all());
         $social->save();
 
         return response()->json([

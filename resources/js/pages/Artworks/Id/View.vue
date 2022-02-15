@@ -6,8 +6,15 @@
                 <router-link v-else :to="{ name: 'sold' }" class="btn btn-outline-dark my-3"><font-awesome-icon :icon="['fas', 'arrow-left']"></font-awesome-icon>  Back</router-link>
             </div>
         </div>
-        <main-product :folder="folder" :artwork="artwork"></main-product>
-        <gallery :photo="artwork.photo"></gallery>
+        <div v-if="!loading">
+            <main-product :folder="folder" :artwork="artwork"></main-product>
+            <gallery :photo="artwork.photo" :folder="folder" :fallback-image="fallbackImage" :edit-mode="false" :refresh="fetchItem"></gallery>
+        </div>
+        <div class="text-center" v-else>
+            <div class="spinner-border text-dark" role="status">
+                <div class="visually-hidden">Loading ...</div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -15,7 +22,7 @@
 import { GET_ARTWORK_PAGE } from "../../../store/types/website";
 import MainProduct from "../../../components/Artworks/MainProduct";
 import Gallery from "../../../components/Artworks/Gallery";
-import OrderModal from "../../../components/Modals/OrderModal";
+import OrderModal from "../../../components/Modals/CustomerOrder";
 
 export default {
     metaInfo() {
@@ -50,6 +57,7 @@ export default {
         return {
             loading: false,
             folder: '/images/artworks',
+            fallbackImage: 'logo.png',
         }
     },
 

@@ -53,6 +53,7 @@
                                                     <p class="my-1">Last Name: <span class="fw-bold">{{ $response['order']->Customer->last_name }}</span></p>
                                                 @endif
                                                 <p class="my-1">Contact Number: <span class="fw-bold">{{ $response['order']->Customer->phone_number }}</span></p>
+                                                <p class="my-1">Artwork Frame: <span class="fw-bold">@if($response['order']->is_done === 0) Framed @else No Frame @endif</span></p>
                                             </ul>
                                         </div>
                                         <div class="col col-md-6">
@@ -63,15 +64,17 @@
                                                 <p class="my-1">Country Code: <span class="fw-bold">{{ $response['order']->Customer->country }}</span></p>
                                                 <p class="my-1">Postal Code: <span class="fw-bold">{{ $response['order']->Customer->zip_code }}</span></p>
                                                 <p class="my-1">Complete Address: <span class="fw-bold">{{ $response['order']->Customer->complete_address }}</span></p>
-                                                <p class="my-1">Status: <span class="fw-bold @if($response['order']->is_done === "1") text-success @else text-warning @endif">@if($response['order']->is_done === "1") Delivered @else On Queue @endif</span></p>
+                                                <p class="my-1">Status: <span class="fw-bold @if($response['order']->is_done === 2) text-success @elseif($response['order']->is_done === 1) text-warning @else text-danger @endif">@if($response['order']->is_done === 2) Delivered @elseif($response['order']->is_done === 1) On Delivery @else On Queue @endif</span></p>
                                             </ul>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col text-center">
                                             <div class="fs-5">
-                                                @if($response['order']->is_done === "1")
+                                                @if($response['order']->is_done === 2)
                                                     Your order has been delivered, Thank you for supporting The Art of Pete Vitalez!
+                                                @elseif($response['order']->is_done === 1)
+                                                    Your order is now on delivery.
                                                 @else
                                                     You will be contacted as soon as the order is done.
                                                 @endif

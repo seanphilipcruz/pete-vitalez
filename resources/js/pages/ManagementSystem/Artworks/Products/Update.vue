@@ -1,19 +1,28 @@
 <template>
     <div class="container my-5 text-open-sans">
-        <div class="row">
+        <div v-if="loading" class="text-center">
+            <div class="spinner-border" role="status">
+                <div class="visually-hidden">Loading ...</div>
+            </div>
+        </div>
+        <div class="row" v-else>
             <div class="col-6">
                 <router-link :to="{ name: 'products-index' }" class="btn btn-outline-dark my-3"><font-awesome-icon :icon="['fas', 'arrow-left']"></font-awesome-icon>  Back</router-link>
             </div>
-        </div>
-        <div class="card" v-if="artwork">
-            <update-form :artwork="artwork"></update-form>
+            <div v-if="artwork">
+                <div class="card mb-3">
+                    <update-form :artwork="artwork"></update-form>
+                </div>
+                <gallery :photo="artwork.photo" :folder="artworksDirectory" :fallback-image="fallbackImage" :edit-mode="true" :refresh="fetchArtwork"></gallery>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import { GET_ARTWORK } from "../../../../store/types/artworks";
-import UpdateForm from "../../../../components/Artworks/UpdateForm";
+import UpdateForm from "../../../../components/Forms/Artworks/Update";
+import Gallery from "../../../../components/Artworks/Gallery";
 
 export default {
     metaInfo() {
@@ -23,12 +32,15 @@ export default {
     },
 
     components: {
+        Gallery,
         UpdateForm
     },
 
     data() {
         return {
             loading: false,
+            artworksDirectory: '/images/artworks',
+            fallbackImage: 'logo.png',
         }
     },
 
@@ -56,13 +68,13 @@ export default {
             }
 
             this.loading = false;
-        }
+        },
     },
 
     computed: {
         artwork() {
             return this.$store.state.artworks.artwork;
-        }
+        },
     },
 
     async created() {

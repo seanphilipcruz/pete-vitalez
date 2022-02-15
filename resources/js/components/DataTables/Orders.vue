@@ -1,6 +1,6 @@
 <template>
     <div class="card">
-        <div class="card-body">
+        <div class="card-body" v-if="!loading">
             <div class="row justify-content-center">
                 <div class="col-12 mb-3">
                     <div class="row justify-content-around">
@@ -34,21 +34,25 @@
                                     <div class="col body">{{ order.code }}</div>
                                     <div class="col body">PHP {{ order.total }}</div>
                                     <div class="col body">
-                                        <div class="badge" :class="order.is_done === 0 ? 'bg-danger' : 'bg-success'">
-                                            {{ order.is_done === 0 ? 'Pending' : 'Sold' }}
+                                        <div class="badge" :class="order.is_done === 0 ? 'bg-danger' : (order.is_done === 1 ? 'bg-warning' : 'bg-success')">
+                                            {{ order.is_done === 0 ? 'Pending' : (order.is_done === 1 ? 'On Delivery' : 'Delivered') }}
                                         </div>
                                     </div>
                                     <div class="col body">
-                                        <div class="btn-group" v-if="order.is_done === 0">
-                                            <button type="button" class="btn btn-outline-dark" @click="updateOrder(order)">
-                                                Finish
-                                            </button>
-                                            <button type="button" class="btn btn-outline-dark" @click="deleteOrder(order)">
-                                                Remove
-                                            </button>
-                                        </div>
-                                        <div v-else>
-                                            Order has been sold.
+                                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" id="optionsDropdown">Options</button>
+                                        <div class="dropdown-menu" aria-labelledby="optionsDropdown">
+                                            <a href="#" class="dropdown-item" @click="deleteOrder(order)">
+                                                <font-awesome-icon :icon="['fas', 'times-circle']" />  Remove
+                                            </a>
+                                            <a href="#" class="dropdown-item" @click="updateOrder(order, 'reset')">
+                                                <font-awesome-icon :icon="['fas', 'redo-alt']" />  On Queue
+                                            </a>
+                                            <a href="#" class="dropdown-item" @click="updateOrder(order, 'delivery')" :class="order.is_done === 1 ? 'disabled' : ''">
+                                                <font-awesome-icon :icon="['fas', 'truck-moving']" />  On Delivery
+                                            </a>
+                                            <a href="#" class="dropdown-item" @click="updateOrder(order, 'finish')" :class="order.is_done === 2 ? 'disabled' : ''">
+                                                <font-awesome-icon :icon="['fas', 'check-circle']" />  Finish
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -95,6 +99,11 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="text-center" v-else>
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading ...</span>
             </div>
         </div>
     </div>
@@ -211,6 +220,8 @@ export default {
 
                 throw error;
             }
+
+            this.loading = false;
         },
 
         async searchDataTable(search) {
@@ -255,20 +266,24 @@ export default {
             await this.fetchOrders();
         },
 
-        async updateOrder(order) {
-            if (order.is_done === 0) {
-                await Popup.fire({
-                    'icon': 'question',
-                    'title': 'Is this order finished? Action is irreversible.',
-                    'text': 'An invoice or official receipt will be sent to the customer',
-                    'confirmButtonText': 'Yes',
-                    'cancelButtonText': 'No'
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        try {
-                            order.is_done = 1;
+        async updateOrder(order, status) {
+            try {
+                if (status === 'delivery') {
+                    order.is_done = 1;
 
+                    await Popup.fire({
+                        'icon': 'question',
+                        'title': 'Are you sure that this order is on delivery?',
+                        'text': 'This will notify our client',
+                        'showConfirmButton': true,
+                        'showCancelButton': true,
+                        'confirmButtonText': 'Yes',
+                        'cancelButtonText': 'No'
+                    }).then(async (res) => {
+                        if (res.isConfirmed === true) {
                             const response = await this.$store.dispatch(UPDATE_ORDER, order);
+
+                            await this.fetchOrders();
 
                             await this.fetchOrders();
 
@@ -276,24 +291,24 @@ export default {
                                 'icon': 'success',
                                 'title': response.data.message,
                             });
-                        } catch (error) {
-                            throw error;
                         }
-                    }
-                })
-            } else {
-                await Popup.fire({
-                    'icon': 'question',
-                    'title': 'Is the order unfinished?',
-                    'text': 'Click yes to confirm',
-                    'confirmButtonText': 'Yes',
-                    'cancelButtonText': 'No'
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        try {
-                            order.is_done = 0;
+                    });
+                } else if (status === 'finish') {
+                    order.is_done = 2;
 
+                    await Popup.fire({
+                        'icon': 'question',
+                        'title': 'Are you sure that this order has been delivered?',
+                        'text': 'This will notify our client',
+                        'showConfirmButton': true,
+                        'showCancelButton': true,
+                        'confirmButtonText': 'Yes',
+                        'cancelButtonText': 'No'
+                    }).then(async (res) => {
+                        if (res.isConfirmed === true) {
                             const response = await this.$store.dispatch(UPDATE_ORDER, order);
+
+                            await this.fetchOrders();
 
                             await this.fetchOrders();
 
@@ -301,11 +316,22 @@ export default {
                                 'icon': 'success',
                                 'title': response.data.message,
                             });
-                        } catch (error) {
-                            throw error;
                         }
-                    }
-                })
+                    });
+                } else if (status === 'reset') {
+                    order.is_done = 0;
+
+                    const response = await this.$store.dispatch(UPDATE_ORDER, order);
+
+                    await this.fetchOrders();
+
+                    await Toast.fire({
+                        'icon': 'success',
+                        'title': response.data.message,
+                    });
+                }
+            } catch (error) {
+                throw error;
             }
         },
 

@@ -35,8 +35,8 @@ export default {
         let router = this.$router;
 
         const config = {
-            "client-id": 'AUFdqLDThzovt7KjyXxZMmgeUTTSpw8bOdpzIzpw3YfidteGsKJLEWSmJNp4jkRR7Ygigkg5ZAfveBZm', // AXIJJG1SR3cOvtfDhswBKXuVXYx7MCNRN-MKQZ7GBcAt_YBtOPOu4c3ThUXnTRIM1WJ6pqfr3efEfrZT -- sandbox account
-            currency: "PHP",
+            "client-id": process.env.MIX_APP_PAYPAL_CLIENT_LIVE, // process.env.MIX_APP_PAYPAL_SANDBOX -- sandbox account
+            "currency": "PHP",
         }
 
         try {

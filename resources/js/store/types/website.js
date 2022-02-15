@@ -14,6 +14,10 @@ export const GET_BLOG_PAGE = 'get/blog';
 export const SET_BLOGS_PAGE = 'set/blogs';
 export const SET_BLOG_PAGE = 'set/blog';
 
+// Photo
+export const GET_MISC_PHOTO = 'get/photo';
+export const SET_MISC_PHOTO = 'set/photo';
+
 // About Me
 export const GET_ABOUT = 'get/about';
 export const SET_ABOUT = 'set/about';

@@ -13,7 +13,7 @@
 
 <script>
 import { GET_BLOG } from "../../../../store/types/blogs";
-import UpdateForm from "../../../../components/Blogs/UpdateForm";
+import UpdateForm from "../../../../components/Forms/Blogs/Update";
 
 export default {
     metaInfo() {

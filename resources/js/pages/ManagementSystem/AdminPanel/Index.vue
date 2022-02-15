@@ -96,7 +96,16 @@
                 </div>
             </div>
             <div class="row mb-3" v-else>
-                <div class="col">
+                <div class="col" v-if="!most_visited">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="fs-4 fw-light">
+                                No available stats for Most Visited Blogs
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col" v-else>
                     <div class="card">
                         <div class="card-body fs-4">
                             <div class="row">
@@ -114,7 +123,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="col">
+                <div class="col" v-if="!most_liked">
+                    <div class="col" v-if="!most_liked">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <div class="fs-4 fw-light">
+                                    No available stats for Most Liked Blogs
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col" v-else>
                     <div class="card">
                         <div class="card-body fs-4">
                             <div class="row">

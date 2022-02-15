@@ -15,7 +15,7 @@ import {
     GET_ABOUT,
     SET_ABOUT,
     SET_MESSAGE,
-    CREATE_MESSAGE
+    CREATE_MESSAGE, SET_MISC_PHOTO, GET_MISC_PHOTO
 } from "../types/website";
 
 const websiteModule = {
@@ -25,8 +25,10 @@ const websiteModule = {
             sub_title: null,
             description: null,
             price: null,
+            frame_price: null,
             image: null,
             is_sold: null,
+            is_framed: null,
             order: null,
             photo: null,
         },
@@ -51,6 +53,13 @@ const websiteModule = {
             visits: null,
             likes: null,
             is_published: null,
+        },
+        photo: {
+            title: null,
+            description: null,
+            image: null,
+            product: false,
+            blog: false,
         },
         request: {
             product_id: null,
@@ -101,6 +110,9 @@ const websiteModule = {
         },
         [SET_LATEST_BLOG](state, payload) {
             state.latestBlog = payload;
+        },
+        [SET_MISC_PHOTO](state, payload) {
+            state.photo = payload;
         },
         [SET_REQUEST](state, payload) {
             state.request = payload;
@@ -179,6 +191,20 @@ const websiteModule = {
                 commit(SET_LATEST_BLOG, latest);
 
                 return latest;
+            } catch (error) {
+                throw error;
+            }
+        },
+
+        async [GET_MISC_PHOTO]({ commit }, _id) {
+            try {
+                const response = await websiteService.getPhoto(_id);
+
+                const photo = response.data;
+
+                commit(SET_MISC_PHOTO, photo);
+
+                return response;
             } catch (error) {
                 throw error;
             }

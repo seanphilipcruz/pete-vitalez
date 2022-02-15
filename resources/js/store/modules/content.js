@@ -28,6 +28,7 @@ const contentsModule = {
             contact_number: null,
             email: null,
             description: null,
+            image: null,
         },
         event: {
             title: null,
@@ -40,6 +41,7 @@ const contentsModule = {
         social: {
             site: null,
             url: null,
+            order: null,
         },
         socials: false,
     },

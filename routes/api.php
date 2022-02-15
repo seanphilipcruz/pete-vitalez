@@ -29,7 +29,7 @@ Route::post('login', [AuthController::class, 'login'])->name('login');
 
 // Validations for incoming creation of customer profiles
 Route::post('validate/form', [Controller::class, 'validate_checkout_form'])->name('validate.form');
-Route::post('send/request', [WebsiteController::class, 'create_request'])->name('send.request');
+Route::post(' send/request', [WebsiteController::class, 'create_request'])->name('send.request');
 
 // For getting the artworks' page in the main website
 Route::get('products', [WebsiteController::class, 'artworks'])->name('website.artworks');
@@ -40,11 +40,16 @@ Route::post('create/order/{product_id}', [WebsiteController::class, 'create_orde
 Route::get('articles', [WebsiteController::class, 'blogs'])->name('website.blogs');
 Route::get('articles/{id}', [WebsiteController::class, 'get_blog'])->name('website.blogs.show');
 
+Route::get('photo/{id}', [WebsiteController::class, 'get_photo'])->name('website.photo.get');
+
 Route::get('about', [WebsiteController::class, 'get_content'])->name('website.content.about');
 
 Route::post('send/message', [WebsiteController::class, 'send_message'])->name('website.send.message');
 
 Route::get('verify/invoice/{invoice_id}', [WebsiteController::class, 'verify_invoice'])->name('website.verify.invoice');
+
+Route::get( 'verify/facebook', [WebsiteController::class, 'receive'])->name('verify.facebook')->middleware('verify.facebook');
+Route::post('verify/facebook', [WebsiteController::class, 'receive']);
 
 Route::group(['middleware' => 'auth:api'], function() {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');

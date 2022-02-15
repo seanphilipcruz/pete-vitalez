@@ -98,7 +98,7 @@
 import { GET_MESSAGES, GET_MESSAGE } from "../../store/types/message";
 import SelectData from "../SelectData";
 import SearchBar from "../SearchBar";
-import ViewMessage from "../Modals/ViewMessageModal";
+import ViewMessage from "../Modals/OpenMessage";
 import utilHelper from "../../helpers/utl";
 
 export default {

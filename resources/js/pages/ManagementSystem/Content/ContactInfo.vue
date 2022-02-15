@@ -1,6 +1,6 @@
 <template>
     <div class="row mb-3">
-        <div class="col-12">
+        <div class="col-12" v-if="!loading">
             <div class="row mb-3">
                 <div class="col-12">
                     <router-link :to="{ name: 'dashboard' }" class="btn btn-outline-dark">
@@ -63,6 +63,7 @@
                                         <div class="fs-5">Description // Meet The Artist</div>
                                         <div v-html="user_info.description"></div>
                                     </div>
+                                    <img :src="assetsFolder + user_info.image" :alt="user_info.image" class="img-fluid">
                                 </div>
                                 <div class="col-6" v-if="editMode && user_info">
                                     <div class="form-floating mb-3">
@@ -81,7 +82,20 @@
                                         <input id="update_contact_number" type="text" class="form-control" placeholder="Contact Number" v-model="form.contact_number">
                                         <label for="update_contact_number">Contact Number</label>
                                     </div>
-                                    <editor :api-key="tiny.key" :init="tiny.config" v-model="form.description"></editor>
+                                    <editor class="mb-3" :api-key="tiny.key" :init="tiny.config" v-model="form.description"></editor>
+                                    <img :src="assetsFolder + user_info.image" :alt="user_info.image" class="img-fluid my-3">
+                                    <div class="row justify-content-center mb-3">
+                                        <div class="col-6 text-center">
+                                            <a href="#cropperModal" ref="upload" data-bs-toggle="modal" hidden>Upload Image</a>
+                                            <label for="file_upload">Artwork Image</label>
+                                            <input id="file_upload" type="file" class="form-control" :class="errors.image ? 'is-invalid' : ''" @click="uploadImage" placeholder="Artwork Image">
+                                            <div v-if="errors.image" class="invalid-feedback">
+                                                <ul class="m-0" v-for="value in errors.image">
+                                                    {{ value }}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -89,12 +103,19 @@
                 </div>
             </div>
         </div>
+        <div class="col-12 text-center" v-else>
+            <div class="spinner-border text-dark" role="status">
+                <span class="visually-hidden">Loading ...</span>
+            </div>
+        </div>
+        <cropper-modal @getImageName="setImageName" type="about"></cropper-modal>
     </div>
 </template>
 
 <script>
 import { GET_CONTACT, CREATE_CONTACT, UPDATE_CONTACT } from "../../../store/types/content";
 import Editor from "@tinymce/tinymce-vue";
+import CropperModal from "../../../components/Modals/PhotoCropper";
 
 const defaultForm = {
     id: null,
@@ -103,6 +124,7 @@ const defaultForm = {
     email: null,
     contact_number: null,
     description: null,
+    image: null,
 }
 
 const formErrors = {
@@ -111,15 +133,18 @@ const formErrors = {
     email: null,
     contact_number: null,
     description: null,
+    image: null,
 }
 
 export default {
     components: {
         Editor,
+        CropperModal
     },
 
     data() {
         return {
+            loading: false,
             editMode: false,
             form: Object.assign({}, defaultForm),
             errors: Object.assign({}, formErrors),
@@ -136,11 +161,14 @@ export default {
                     image_advtab: true,
                 }
             },
+            assetsFolder: '/assets/about/'
         }
     },
 
     methods: {
         async getContactInfo() {
+            this.loading = true;
+
             try {
                 const response = await this.$store.dispatch(GET_CONTACT);
 
@@ -153,9 +181,13 @@ export default {
             } catch (error) {
                 throw error;
             }
+
+            this.loading = false;
         },
 
         async saveContactInfo() {
+            this.loading = true;
+
             try {
                 const response = await this.$store.dispatch(CREATE_CONTACT, this.form);
 
@@ -170,9 +202,13 @@ export default {
             } catch (error) {
                 throw error;
             }
+
+            this.loading = false;
         },
 
         async updateContactInfo() {
+            this.loading = true;
+
             try {
                 const response = await this.$store.dispatch(UPDATE_CONTACT, this.form);
 
@@ -187,7 +223,19 @@ export default {
             } catch (error) {
                 throw error;
             }
-        }
+
+            this.loading = false;
+        },
+
+        setImageName(image) {
+            this.form.image = image;
+        },
+
+        uploadImage(e) {
+            e.preventDefault();
+
+            this.$refs.upload.click();
+        },
     },
 
     computed: {

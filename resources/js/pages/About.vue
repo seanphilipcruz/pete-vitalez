@@ -11,36 +11,42 @@
         </div>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-12 col-md-8">
+                <div class="col-12 col-md-6">
                     <div class="row justify-content-center">
                         <div class="col-12 col-md-8">
                             <div class="mt-4 mb-2">
                                 <div class="fs-2 fw-bold text-uppercase mb-2">Exhibitions</div>
                                 <div class="row justify-content-between fw-bold" v-for="event in content.events" :key="event.id" v-if="event.type === 'exhibition'">
-                                    <div class="col-6 fw-bold text-open-sans">{{ event.title }} <p class="fw-light">{{ event.description }}</p></div>
-                                    <div class="col-6 text-open-sans text-end" v-if="!event.start && !event.end"></div>
-                                    <div class="col-6 text-open-sans text-end" v-else-if="!event.end">{{ event.start }}</div>
-                                    <div class="col-6 text-open-sans text-end" v-else>{{ event.start }} - {{ event.end }}</div>
+                                    <div class="col-8 fw-bold text-open-sans">{{ event.title }} <p class="fw-light">{{ event.description }}</p></div>
+                                    <div class="col-4 text-open-sans text-end" v-if="!event.start && !event.end"></div>
+                                    <div class="col-4 text-open-sans text-end" v-else-if="!event.end">{{ event.start }}</div>
+                                    <div class="col-4 text-open-sans text-end" v-else>{{ event.start }} - {{ event.end }}</div>
                                 </div>
                             </div>
-                            <div class="mt-2">
+                            <div class="mt-2 mb-2">
                                 <div class="fs-2 fw-bold text-uppercase mb-2">Guestings and Features</div>
                                 <div class="row justify-content-between fw-bold" v-for="event in content.events" :key="event.id" v-if="event.type === 'guesting'">
-                                    <div class="col-6 fw-bold text-open-sans">{{ event.title }} <p class="fw-light">{{ event.description }}</p></div>
-                                    <div class="col-6 text-open-sans text-end" v-if="!event.start && !event.end"></div>
-                                    <div class="col-6 text-open-sans text-end" v-else-if="!event.end">{{ event.start }}</div>
-                                    <div class="col-6 text-open-sans text-end" v-else>{{ event.start }} - {{ event.end }}</div>
+                                    <div class="col-8 fw-bold text-open-sans">{{ event.title }} <p class="fw-light">{{ event.description }}</p></div>
+                                    <div class="col-4 text-open-sans text-end" v-if="!event.start && !event.end"></div>
+                                    <div class="col-4 text-open-sans text-end" v-else-if="!event.end">{{ event.start }}</div>
+                                    <div class="col-4 text-open-sans text-end" v-else>{{ event.start }} - {{ event.end }}</div>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col d-grid">
+                                    <a href="#events-modal" type="button" class="btn btn-outline-dark" data-bs-toggle="modal">See All</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="d-none d-md-block d-lg-block d-xl-block d-xxl-block col-md-4">
-                    <img :src="info_image" alt="pete_vitalez.png" class="img-fluid">
+                <div class="d-none d-md-block d-lg-block d-xl-block d-xxl-block col-md-6">
+                    <img :src="assetsFolder + content.contact.image" :alt="content.contact.image" class="img-fluid">
                 </div>
             </div>
         </div>
         <contact-form :contact="content.contact" :socials="content.socials"></contact-form>
+        <events-modal :events="content.events" />
     </div>
 </template>
 
@@ -48,6 +54,7 @@
 import { GET_ABOUT } from "../store/types/website";
 import WebsiteHeader from '../components/Header';
 import ContactForm from "../components/Contact";
+import EventsModal from "../components/Modals/Events";
 
 export default {
     metaInfo() {
@@ -75,13 +82,14 @@ export default {
 
     components: {
         ContactForm,
-        WebsiteHeader
+        WebsiteHeader,
+        EventsModal
     },
 
     data() {
         return {
             loading: false,
-            info_image: '/assets/about/info-image.png'
+            assetsFolder: '/assets/about/'
         }
     },
 

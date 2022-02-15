@@ -46,6 +46,12 @@ const websiteService = {
         return response;
     },
 
+    async getPhoto(id) {
+        const response = await axios.get(route('website.photo.get', id));
+
+        return response;
+    },
+
     async createRequest(request) {
         const response = await axios.post(route('send.request'), request);
 

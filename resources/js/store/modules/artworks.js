@@ -16,8 +16,12 @@ const artworksModule = {
             sub_title: null,
             description: null,
             price: null,
+            frame_price: null,
             image: null,
-            is_sold: null
+            is_sold: null,
+            is_draft: null,
+            is_framed: null,
+            photo: null,
         },
         artworks: false,
     },

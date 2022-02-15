@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import ContactForm from "./ContactForm";
+import ContactForm from "./Forms/ContactUs";
 
 export default {
     props: {

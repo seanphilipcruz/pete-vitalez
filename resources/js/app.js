@@ -43,7 +43,10 @@ import {
     faPaintBrush,
     faNewspaper,
     faInbox,
-    faThumbsUp
+    faThumbsUp,
+    faTruckMoving,
+    faRedoAlt,
+    faEllipsisH
 } from "@fortawesome/free-solid-svg-icons";
 import { faFacebook, faTwitter, faInstagram, faLinkedinIn, faPinterest } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon, FontAwesomeLayers, FontAwesomeLayersText } from "@fortawesome/vue-fontawesome";
@@ -81,7 +84,10 @@ library.add(
     faPaintBrush,
     faNewspaper,
     faInbox,
-    faThumbsUp
+    faThumbsUp,
+    faTruckMoving,
+    faRedoAlt,
+    faEllipsisH
 );
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
@@ -97,6 +103,13 @@ Vue.use(VueSocialSharing);
 // Recaptcha
 import { VueReCaptcha } from "vue-recaptcha-v3";
 Vue.use(VueReCaptcha, { siteKey: process.env.MIX_RECAPTCHA_SITE_KEY });
+
+import VueFbCustomerChat from "vue-fb-customer-chat";
+Vue.use(VueFbCustomerChat, {
+    page_id: 107634483908494,
+    theme_color: '#000000',
+    locale: 'en_US',
+})
 
 window.Popup = popup;
 window.Toast = toast;

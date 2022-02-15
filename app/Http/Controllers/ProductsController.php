@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Photo;
 use App\Models\Product;
 use App\Models\Shipping;
 use Illuminate\Http\Request;
@@ -64,6 +65,7 @@ class ProductsController extends Controller
             'description' => 'required',
             'price' => 'numeric|required',
             'image' => 'string|required',
+            'frame_price' => 'numeric|required',
         ]);
 
         if ($validator->fails()) {
@@ -77,6 +79,28 @@ class ProductsController extends Controller
         $product['is_sold'] = 0;
         $product->save();
 
+        // get the latest created product
+        $latest_product = Product::with('Order', 'Photo')
+            ->latest()
+            ->first();
+
+        // get the id
+        $product_id = $latest_product->id;
+
+        // setting up variables of verifying the photo data
+        $extra_photo = $request['photo'];
+        $photo_count = sizeof($extra_photo);
+
+        // count the photo data from the array
+        if ($photo_count > 0) {
+            // create photo data from the array of photos in the request
+            foreach ($extra_photo as $photo_data) {
+                $photo = new Photo($photo_data);
+                $photo->Product()->associate($product_id);
+                $photo->save();
+            }
+        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'Artwork has been added'
@@ -84,7 +108,7 @@ class ProductsController extends Controller
     }
 
     public function show($id) {
-        $product = Product::with('Order.Customer')->findOrFail($id);
+        $product = Product::with('Order.Customer', 'Photo')->findOrFail($id);
 
         return response()->json($product);
     }
@@ -95,6 +119,7 @@ class ProductsController extends Controller
             'sub_title' => 'required',
             'description' => 'required',
             'price' => 'numeric|required',
+            'frame_price' => 'numeric|required',
         ]);
 
         if ($validator->fails()) {

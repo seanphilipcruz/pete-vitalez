@@ -3,9 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Mail\ArtworkRequest;
-use App\Mail\OrderInformation;
-use App\Mail\ProductInvoice;
 use App\Mail\WebsiteMessage;
 use App\Models\Blog;
 use App\Models\Contact;
@@ -14,13 +11,14 @@ use App\Models\Event;
 use App\Models\JobOrder;
 use App\Models\Message;
 use App\Models\Order;
+use App\Models\Photo;
 use App\Models\Product;
 use App\Models\Social;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class WebsiteController extends Controller
 {
@@ -223,6 +221,12 @@ class WebsiteController extends Controller
         return response()->json($blog);
     }
 
+    public function get_photo($id) {
+        $photo = Photo::with('Product', 'Blog')->findOrFail($id);
+
+        return response()->json($photo);
+    }
+
     public function create_order($id, Request $request) {
         $this->create_customer($request);
 
@@ -266,11 +270,9 @@ class WebsiteController extends Controller
         $validator = Validator::make($request->all(), [
             'first_name' => 'string|required',
             'last_name' => 'string|required',
-            'email' => 'email|required',
             'country_code' => 'required',
             'phone_number' => 'required',
             'address' => 'min:10|required',
-            'zip_code' => 'required',
             'city' => 'required',
             'state' => 'required',
             'description' => 'required',
@@ -353,19 +355,48 @@ class WebsiteController extends Controller
     }
 
     public function get_content() {
-        $contact = Contact::latest()->first();
-        $events = Event::whereNull('deleted_at')->orderBy('start')->count();
-        $socials = Social::whereNull('deleted_at')->get();
+        $contact = Contact::latest()
+            ->first();
+        $events = Event::whereNull('deleted_at')
+            ->count();
+        $socials = Social::whereNull('deleted_at')
+            ->orderBy('order')
+            ->get();
+
+        $contact->image = $this->verify_photo($contact->image, 'about');
 
         if ($events > 0) {
-            $events = Event::whereNull('deleted_at')->orderBy('start')->get();
+            $events = Event::whereNull('deleted_at')
+                ->orderBy('type')
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->take(8);
 
             foreach ($events as $event) {
-                if ($event->start && $event->end) {
-                    $event->start = date('F d, Y', strtotime($event->start));
-                    $event->end = date('F d, Y', strtotime($event->end));
-                } elseif ($event->start) {
-                    $event->start = date('F d, Y', strtotime($event->start));
+                // Date processing
+                if ($event->start && $event->end === null) {
+                    $event->start = date('M d, Y', strtotime($event->start));
+                } elseif ($event->start !== null && $event->end !== null) {
+                    $year_start = date('Y', strtotime($event->start));
+                    $year_end = date('Y', strtotime($event->end));
+
+                    $month_start = date('m', strtotime($event->start));
+                    $month_end = date('m', strtotime($event->end));
+
+                    if ($month_start === $month_end && $year_start === $year_end) {
+                        $event->start = date('M d', strtotime($event->start));
+                        $event->end = date('d, Y', strtotime($event->end));
+                    }
+
+                    if ($month_start !== $month_end && $year_start === $year_end) {
+                        $event->start = date('M d', strtotime($event->start));
+                        $event->end = date('M d, Y', strtotime($event->end));
+                    }
+
+                    if ($year_start !== $year_end) {
+                        $event->start = date('M d, Y', strtotime($event->start));
+                        $event->end = date('M d, Y', strtotime($event->end));
+                    }
                 }
             }
         }
@@ -413,5 +444,33 @@ class WebsiteController extends Controller
             return view('verify', compact('response'));
         }
         return view('verify', compact('response'));
+    }
+
+    // for future, chat-bot in facebook but messenger plugin did its job
+    public function receive(Request $request) {
+        $id = $request['entry'][0]['messaging'][0]['sender']['id'];
+
+        $this->send_chat($id, 'Hello!');
+    }
+
+    private function send_chat($recipient_id, $chat_message) {
+        $token = Env::get("MIX_FACEBOOK_MESSENGER_TOKEN");
+
+        $message = [
+            'recipient' => [
+                'id' => $recipient_id
+            ],
+            'message' => [
+                'text' => $chat_message
+            ]
+        ];
+
+        $ch = curl_init('https://graph.facebook.com/v2.6/me/messages?access_token=' . $token);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
+        curl_exec($ch);
     }
 }

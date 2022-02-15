@@ -126,7 +126,13 @@ class OrdersController extends Controller
             'contact' => $contact_info
         ];
 
-        $this->send_invoice($invoice_details);
+        // everytime the order has been updated
+        if ($invoice_details['order']->is_done === 1) {
+            $this->send_order_update($invoice_details);
+        } else if ($invoice_details['order']->is_done === 2) {
+            $this->send_order_update($invoice_details);
+            $this->send_invoice($invoice_details);
+        }
 
         return response()->json([
             'status' => 'success',

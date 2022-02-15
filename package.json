@@ -33,6 +33,7 @@
         "sweetalert2": "^11.3.0",
         "vue-advanced-cropper": "^1.9.0",
         "vue-axios": "^3.4.0",
+        "vue-fb-customer-chat": "^0.2.1",
         "vue-invoice": "^1.1.4",
         "vue-meta": "^2.4.0",
         "vue-parallaxy": "^1.1.1",

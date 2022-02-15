@@ -9,6 +9,7 @@ import requestModule from "./modules/requests";
 import contentsModule from "./modules/content";
 import messageModule from "./modules/message";
 import dashboardModule from "./modules/dashboard";
+import photosModule from "./modules/photos";
 
 Vue.use(Vuex);
 
@@ -22,6 +23,7 @@ export default new Vuex.Store({
         requests: requestModule,
         content: contentsModule,
         message: messageModule,
-        data: dashboardModule
+        data: dashboardModule,
+        photos: photosModule
     }
 });

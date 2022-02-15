@@ -38,7 +38,7 @@
                     <li class="nav-item">
                         <router-link :to="{ name: 'about' }" class="nav-link">About Me</router-link>
                     </li>
-                    <li class="nav-item dropdown" v-if="!isAuthenticated">
+                    <li class="nav-item dropdown" :class="!isAuthenticated ? 'visually-hidden' : ''" v-if="!isAuthenticated">
                         <a href="#"
                            class="nav-link dropdown-toggle"
                            id="navbarSignup"

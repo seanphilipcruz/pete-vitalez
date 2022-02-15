@@ -15,8 +15,11 @@ class Product extends Model
         'sub_title',
         'description',
         'price',
+        'frame_price',
         'image',
         'is_sold',
+        'is_draft',
+        'visits',
     ];
 
     public function Order() {

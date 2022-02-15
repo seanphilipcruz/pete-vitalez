@@ -15,6 +15,7 @@ class Order extends Model
         'customer_id',
         'code',
         'total',
+        'is_framed',
         'is_done'
     ];
 

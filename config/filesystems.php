@@ -58,6 +58,11 @@ return [
             'root' => '../assets'
         ],
 
+        'about' => [
+            'driver' => 'local',
+            'root' => './assets/about'
+        ],
+
         'artwork' => [
             'driver' => 'local',
             'root' => './images/artworks'
@@ -67,7 +72,6 @@ return [
             'driver' => 'local',
             'root' => './images/blogs'
         ]
-
     ],
 
     /*

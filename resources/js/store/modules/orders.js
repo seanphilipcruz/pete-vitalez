@@ -14,6 +14,7 @@ const ordersModule = {
             customer_id: null,
             code: null,
             total: null,
+            is_framed: null,
             is_done: null,
             product: false,
             customer: false,

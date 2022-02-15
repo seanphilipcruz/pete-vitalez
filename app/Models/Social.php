@@ -12,6 +12,7 @@ class Social extends Model
 
     protected $fillable = [
         'site',
-        'url'
+        'url',
+        'order'
     ];
 }

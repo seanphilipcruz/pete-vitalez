@@ -43,6 +43,10 @@ export default {
         content() {
             return this.$store.state.website.content;
         }
+    },
+
+    async created() {
+        await this.getAbout();
     }
 }
 </script>
