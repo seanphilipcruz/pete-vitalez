@@ -1,6 +1,6 @@
 <template>
     <div id="hover-items" class="row mb-3">
-        <div class="col-6 col-sm-6 col-md-3 mb-3" v-for="artwork in artworks.data" :key="artwork.id">
+        <div class="col-12 col-sm-6 col-md-3 mb-3" v-for="artwork in artworks.data" :key="artwork.id">
             <div class="card shadow" @click="viewArtwork(artwork)">
                 <img :src="folder + '/' + (artwork.image ? artwork.image : fallbackImage)" :alt="artwork ? artwork.image : 'logo.png'" class="card-img-top">
                 <div class="card-body text-center">
