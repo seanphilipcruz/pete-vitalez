@@ -10,6 +10,7 @@ use App\Models\Blog;
 use App\Models\JobOrder;
 use App\Models\Message;
 use App\Models\Order;
+use App\Models\Photo;
 use App\Models\Product;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -226,5 +227,28 @@ class Controller extends BaseController
         Mail::to('petevitalez@theartofpetevitalez.com')->send(new ArtworkRequest($request_details));
 
         return true;
+    }
+
+    public function save_extra_photo($photo_data, $model_id, $product = false) {
+        // setting up variables of verifying the photo data
+        $photo_count = sizeof($photo_data);
+
+        // count the photo data from the array
+        if ($photo_count > 0) {
+            // create photo data from the array of photos in the request
+            foreach ($photo_data as $data) {
+                if (sizeof($data) === 3) {
+                    if ($product == true) {
+                        $photo = new Photo($data);
+                        $photo->Product()->associate($model_id);
+                        $photo->save();
+                    } else {
+                        $photo = new Photo($data);
+                        $photo->Blog()->associate($model_id);
+                        $photo->save();
+                    }
+                }
+            }
+        }
     }
 }

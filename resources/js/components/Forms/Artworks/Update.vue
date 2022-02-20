@@ -15,7 +15,7 @@
                 <div class="row justify-content-center mb-3">
                     <div class="col col-md-8">
                         <div class="float-end">
-                            <button type="button" class="btn btn-outline-dark"><font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>  Add Image</button>
+                            <button type="button" class="btn btn-outline-dark" data-bs-target="#addPhotoModal" data-bs-toggle="modal"><font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>  Add Image</button>
                         </div>
                     </div>
                 </div>
@@ -111,6 +111,7 @@
             </div>
         </div>
         <cropper-modal @getImageName="setImageName" type="artwork"></cropper-modal>
+        <add-photo-modal @getPhotoData="setPhotoData" type="artwork_photo" @uploaded="submit"></add-photo-modal>
     </form>
 </template>
 
@@ -118,6 +119,7 @@
 import { UPDATE_ARTWORK } from "../../../store/types/artworks";
 import Editor from "@tinymce/tinymce-vue";
 import CropperModal from "../../Modals/PhotoCropper";
+import AddPhotoModal from "../../Modals/AddPhoto";
 
 const defaultForm = {
     title: null,
@@ -146,18 +148,24 @@ export default {
         artwork: {
             type: Object,
             required: true
+        },
+        refresh: {
+            type: Function,
+            required: true,
         }
     },
 
     components: {
         Editor,
-        CropperModal
+        CropperModal,
+        AddPhotoModal
     },
 
     data() {
         return {
             loading: false,
             valid: true,
+            form: Object.assign({}, defaultForm),
             form_errors: Object.assign({}, errors),
             tiny: {
                 key: process.env.MIX_APP_TINY_API_KEY,
@@ -172,7 +180,6 @@ export default {
                     image_advtab: true,
                 }
             },
-            form: Object.assign({}, defaultForm),
         }
     },
 
@@ -183,11 +190,12 @@ export default {
             try {
                 await this.$store.dispatch(UPDATE_ARTWORK, this.form);
 
+                this.$props.refresh();
+
                 await Toast.fire({
                     'icon': 'success',
                     'title': 'Artwork has been updated'
                 });
-
             } catch (error) {
                 const { status, message } = error.response.data;
 
@@ -210,6 +218,10 @@ export default {
 
         setImageName(image) {
             this.form.image = image;
+        },
+
+        setPhotoData(image_data) {
+            this.form.photo.push(image_data);
         },
 
         uploadImage(e) {

@@ -16,7 +16,7 @@
                         <div v-else>
                             <div class="row justify-content-center mb-3" v-if="!image.src">
                                 <div class="col-6 text-center">
-                                    <img :src="artworksDirectory + form.image" class="img-fluid" :alt="form.image" />
+                                    <img :src="(type === 'artwork_photo' ? artworksDirectory : blogsDirectory) + form.image" class="img-fluid" :alt="form.image" />
                                 </div>
                             </div>
                             <div class="row justify-content-center mb-3">
@@ -32,7 +32,7 @@
                                 </div>
                             </div>
                             <div class="row justify-content-center mb-3">
-                                <div class="col-8 text-center">
+                                <div class="col-6 text-center">
                                     <button v-if="image.src" type="button" class="btn btn-outline-dark" @click="crop()">Crop</button>
                                     <button v-if="image.src" type="button" class="btn btn-outline-dark" @click="reset()">Reset</button>
                                     <button v-if="!image.src" type="button" class="btn btn-outline-dark" @click="$refs.file.click()">
@@ -44,8 +44,8 @@
                             <div class="row justify-content-center mb-3">
                                 <div class="col-8">
                                     <div class="form-floating">
-                                        <input id="title" type="text" class="form-control" :class="errors.title ? 'is-invalid': ''" v-model="form.title" placeholder="Photo Title">
-                                        <label for="title">Photo Title</label>
+                                        <input id="update_title" type="text" class="form-control" :class="errors.title ? 'is-invalid': ''" v-model="form.title" placeholder="Photo Title">
+                                        <label for="update_title">Photo Title</label>
                                         <div class="invalid-feedback">
                                             <ul class="mb-1" v-for="error in errors.title">
                                                 {{ error }}
@@ -56,8 +56,8 @@
                             </div>
                             <div class="row justify-content-center mb-3">
                                 <div class="col-8">
-                                    <label for="photo_description" class="mb-2">Photo Description</label>
-                                    <editor id="photo_description" :api-key="tiny.key" :init="tiny.config" v-model="form.description" :class="errors.description ? 'is-invalid' : ''"></editor>
+                                    <label for="update_photo_description" class="mb-2">Photo Description</label>
+                                    <editor id="update_photo_description" :api-key="tiny.key" :init="tiny.config" v-model="form.description" :class="errors.description ? 'is-invalid' : ''"></editor>
                                     <div v-if="errors.description" class="invalid-feedback">
                                         <ul class="m-0" v-for="value in errors.description">
                                             {{ value }}
@@ -66,14 +66,19 @@
                                 </div>
                             </div>
                             <div class="row mb-3 justify-content-center">
-                                <div class="col-2 d-grid">
-                                    <button type="button" class="btn btn-outline-dark" @click="updatePhoto" v-if="!saving">
-                                        <font-awesome-icon :icon="['fas', 'check-circle']" /> Update
-                                    </button>
+                                <div class="col-4 d-grid">
+                                    <div class="btn-group" v-if="!saving">
+                                        <button type="button" class="btn btn-outline-dark" @click="updatePhoto">
+                                            <font-awesome-icon :icon="['fas', 'check-circle']" />&nbsp;Update
+                                        </button>
+                                        <button type="button" class="btn btn-outline-dark" @click="deletePhoto">
+                                            <font-awesome-icon :icon="['fas', 'trash']" />&nbsp;Delete
+                                        </button>
+                                    </div>
                                     <button type="button" class="btn btn-outline-dark disabled" v-else>
-                                        <p class="spinner-border text-dark" role="status">
-                                            <span class="visually-hidden">Loading ...</span>
-                                        </p>
+                                        <span class="spinner-border text-dark" role="status">
+                                            <i class="visually-hidden">Loading ...</i>
+                                        </span>
                                     </button>
                                 </div>
                             </div>
@@ -115,7 +120,7 @@
 </template>
 
 <script>
-import { UPDATE_PHOTO } from "../../store/types/photos";
+import { UPDATE_PHOTO, DELETE_PHOTO } from "../../store/types/photos";
 import { Cropper } from "vue-advanced-cropper";
 import 'vue-advanced-cropper/dist/style.css';
 import Editor from "@tinymce/tinymce-vue";
@@ -162,6 +167,7 @@ export default {
         photo: {
             required: true,
         },
+
         type: {
             required: true,
         },
@@ -292,7 +298,7 @@ export default {
         destroyed(e) {
             if (this.image.src) {
                 URL.revokeObjectURL(this.image.src);
-            }vb
+            }
         },
 
         async updatePhoto() {
@@ -312,12 +318,44 @@ export default {
             }
 
             this.saving = false;
+        },
+
+        async deletePhoto() {
+            this.saving = true;
+
+            Popup.fire({
+                'icon': 'question',
+                'title': 'Are you sure to delete this Photo?',
+                'confirmButtonText': 'Yes',
+                'cancelButtonText': 'No',
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await this.$store.dispatch(DELETE_PHOTO, this.photo);
+                        this.$emit('updated');
+                        this.$refs["dismiss-button"].click();
+
+                        Toast.fire({
+                            'icon': response.data.status,
+                            'title': response.data.message
+                        });
+                    } catch (error) {
+                        throw error;
+                    }
+                }
+            });
+
+            this.saving = false;
         }
     },
 
     computed: {
         artworksDirectory()  {
             return '/images/artworks/';
+        },
+
+        blogsDirectory() {
+            return '/images/blogs/';
         }
     },
 

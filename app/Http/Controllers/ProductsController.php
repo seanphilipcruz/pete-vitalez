@@ -87,18 +87,8 @@ class ProductsController extends Controller
         // get the id
         $product_id = $latest_product->id;
 
-        // setting up variables of verifying the photo data
-        $extra_photo = $request['photo'];
-        $photo_count = sizeof($extra_photo);
-
-        // count the photo data from the array
-        if ($photo_count > 0) {
-            // create photo data from the array of photos in the request
-            foreach ($extra_photo as $photo_data) {
-                $photo = new Photo($photo_data);
-                $photo->Product()->associate($product_id);
-                $photo->save();
-            }
+        if (sizeof($request['photo']) > 0) {
+            $this->save_extra_photo($request['photo'], $product_id, true);
         }
 
         return response()->json([
@@ -132,6 +122,8 @@ class ProductsController extends Controller
         $product = Product::with('Order')->findOrFail($id);
 
         $product->update($request->all());
+
+        $this->save_extra_photo($request['photo'], $product->id, true);
 
         return response()->json([
             'status' => 'success',

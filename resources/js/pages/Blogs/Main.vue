@@ -8,10 +8,11 @@
         </div>
         <div id="not-found-container" class="row" v-if="!blogs">
             <div class="col-12">
+                <filter-bar :search="webpage.search" @searchWebpage="searchForBlogs" @sortData="changeBlogSorting" :fields="filter_fields"></filter-bar>
                 <div class="d-flex justify-content-center align-items-center">
                     <img :src="logo" alt="logo.png" class="img-fluid" width="450px" />
                     <div class="display-5 text-center my-3 text-open-sans">
-                        Writing my Articles, check back later!
+                        No blogs found, check back later!
                     </div>
                 </div>
             </div>
@@ -43,6 +44,7 @@ import { GET_BLOGS_PAGE, GET_LATEST_BLOG } from "../../store/types/website";
 import BlogsContainer from "../../components/Blogs/Index.vue"
 import Pagination from "../../components/Pagination";
 import utilHelper from "../../helpers/utl";
+import FilterBar from "../../components/FilterBar";
 
 export default {
     metaInfo() {
@@ -71,6 +73,7 @@ export default {
     components: {
         Pagination,
         BlogsContainer,
+        FilterBar
     },
 
     data() {
@@ -140,8 +143,6 @@ export default {
         },
 
         async fetchBlogs() {
-            this.loading = true;
-
             try {
                 const query = {
                     page: this.webpage.page,
@@ -164,7 +165,6 @@ export default {
                 throw error;
             }
 
-            this.loading = false;
         },
 
         async changeBlogSorting(header) {
@@ -242,7 +242,7 @@ export default {
     watch: {
         ['webpage.search']: utilHelper.debounce(async function() {
             await this.fetchBlogs();
-        }, 1500)
+        }, 3000)
     }
 }
 </script>

@@ -13,13 +13,6 @@
                     </div>
                 </div>
                 <div class="row justify-content-center mb-3">
-                    <div class="col col-md-8">
-                        <div class="float-end">
-                            <button type="button" class="btn btn-outline-dark" data-bs-target="#addPhotoModal" data-bs-toggle="modal"><font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>  Add Image</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="row justify-content-center mb-3">
                     <div class="col-4">
                         <div class="form-floating">
                             <input type="text" id="title" class="form-control" :class="form_errors.title ? 'is-invalid' : ''" v-model="form.title" placeholder="Title">
@@ -110,7 +103,6 @@
             </div>
         </div>
         <cropper-modal @getImageName="setImageName" type="artwork"></cropper-modal>
-        <add-photo-modal @getPhotoData="setPhotoData" type="artwork_photo"></add-photo-modal>
     </form>
 </template>
 

@@ -70,7 +70,14 @@ class BlogsController extends Controller
         }
 
         $blog = new Blog($validator->validated());
+
         $blog->save();
+
+        $blog_id = Blog::with('Photo')->latest()->first();
+
+        if (sizeof($request['photo']) > 0) {
+            $this->save_extra_photo($request['photo'], $blog_id);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -80,6 +87,8 @@ class BlogsController extends Controller
 
     public function show($id) {
         $blog = Blog::with('Photo')->findOrFail($id);
+
+        $blog['image'] = $this->verify_photo($blog['image'], 'blog');
 
         $blog['date'] = date('Y-m-d', strtotime($blog['date']));
 
@@ -106,6 +115,8 @@ class BlogsController extends Controller
         $blog = Blog::with('Photo')->findOrFail($id);
 
         $blog->update($request->all());
+
+        $this->save_extra_photo($request['photo'], $blog->id);
 
         return response()->json([
             'status' => 'success',

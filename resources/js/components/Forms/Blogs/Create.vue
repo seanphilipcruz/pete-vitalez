@@ -7,6 +7,11 @@
         </div>
         <div class="card body">
             <div class="my-3">
+                <div class="row justify-content-center mb-3" v-if="form.image">
+                    <div class="col-3 text-center">
+                        <img :src="blogsDirectory + form.image" class="img-fluid" :alt="form.image" />
+                    </div>
+                </div>
                 <div class="row justify-content-center mb-3">
                     <div class="col-4">
                         <div class="form-floating">
@@ -90,6 +95,7 @@
 import { CREATE_BLOG } from "../../../store/types/blogs";
 import Editor from "@tinymce/tinymce-vue";
 import CropperModal from "../../Modals/PhotoCropper";
+import AddPhotoModal from "../../Modals/AddPhoto";
 
 const defaultForm = {
     title: null,
@@ -116,15 +122,16 @@ const errors = {
 export default {
     components: {
         Editor,
-        CropperModal
+        CropperModal,
+        AddPhotoModal
     },
 
     data() {
         return {
             loading: false,
             valid: true,
-            form_errors: Object.assign({}, errors),
             form: Object.assign({}, defaultForm),
+            form_errors: Object.assign({}, errors),
             tiny: {
                 key: process.env.MIX_APP_TINY_API_KEY,
                 config: {
@@ -138,6 +145,8 @@ export default {
                     image_advtab: true,
                 }
             },
+            blogsDirectory: '/images/blogs',
+            fallbackImage: 'logo.png',
         }
     },
 
@@ -185,6 +194,10 @@ export default {
 
         setImageName(image) {
             this.form.image = image;
+        },
+
+        setPhotoData(image_data) {
+            this.form.photo.push(image_data);
         },
 
         uploadImage(e) {

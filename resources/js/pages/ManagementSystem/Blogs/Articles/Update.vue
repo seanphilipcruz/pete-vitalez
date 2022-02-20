@@ -1,12 +1,20 @@
 <template>
-    <div class="container my-5">
-        <div class="row">
+    <div class="container my-5 text-open-sans">
+        <div v-if="loading" class="text-center">
+            <div class="spinner-border" role="status">
+                <div class="visually-hidden">Loading ...</div>
+            </div>
+        </div>
+        <div class="row" v-else>
             <div class="col-6">
                 <router-link :to="{ name: 'articles-index' }" class="btn btn-outline-dark my-3"><font-awesome-icon :icon="['fas', 'arrow-left']"></font-awesome-icon>  Back</router-link>
             </div>
-        </div>
-        <div class="card" v-if="blog">
-            <update-form :blog="blog"></update-form>
+            <div v-if="blog">
+                <div class="card mb-3">
+                    <update-form :blog="blog" :refresh="fetchBlog"></update-form>
+                </div>
+                <gallery photo_type="blog_photo" :photo="blog.photo" :folder="blogsDirectory" :fallback-image="fallbackImage" :edit-mode="true" :refresh="fetchBlog"></gallery>
+            </div>
         </div>
     </div>
 </template>
@@ -14,6 +22,7 @@
 <script>
 import { GET_BLOG } from "../../../../store/types/blogs";
 import UpdateForm from "../../../../components/Forms/Blogs/Update";
+import Gallery from "../../../../components/Artworks/Gallery";
 
 export default {
     metaInfo() {
@@ -23,7 +32,16 @@ export default {
     },
 
     components: {
-        UpdateForm
+        UpdateForm,
+        Gallery
+    },
+
+    data() {
+        return {
+            loading: false,
+            blogsDirectory: '/images/blogs',
+            fallbackImage: 'logo.png',
+        }
     },
 
     methods: {

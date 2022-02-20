@@ -13,6 +13,13 @@
                     </div>
                 </div>
                 <div class="row justify-content-center mb-3">
+                    <div class="col col-md-8">
+                        <div class="float-end">
+                            <button type="button" class="btn btn-outline-dark" data-bs-target="#addPhotoModal" data-bs-toggle="modal"><font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>  Add Image</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center mb-3">
                     <div class="col-4">
                         <div class="form-floating">
                             <input type="text" id="title" class="form-control" :class="form_errors.title ? 'is-invalid' : ''" v-model="form.title" placeholder="Title">
@@ -88,6 +95,7 @@
             </div>
         </div>
         <cropper-modal @getImageName="setImageName" type="blog"></cropper-modal>
+        <add-photo-modal @getPhotoData="setPhotoData" type="blog_photo" @uploaded="submit"></add-photo-modal>
     </form>
 </template>
 
@@ -95,6 +103,7 @@
 import { UPDATE_BLOG } from "../../../store/types/blogs";
 import Editor from "@tinymce/tinymce-vue";
 import CropperModal from "../../Modals/PhotoCropper";
+import AddPhotoModal from "../../Modals/AddPhoto";
 
 const defaultForm = {
     title: null,
@@ -123,12 +132,17 @@ export default {
         blog: {
             type: Object,
             required: true
+        },
+        refresh: {
+            type: Function,
+            required: true,
         }
     },
 
     components: {
         Editor,
-        CropperModal
+        CropperModal,
+        AddPhotoModal
     },
 
     data() {
@@ -160,13 +174,11 @@ export default {
             try {
                 await this.$store.dispatch(UPDATE_BLOG, this.form);
 
+                this.$props.refresh();
+
                 await Toast.fire({
                     'icon': 'success',
                     'title': 'Blog has been updated'
-                });
-
-                this.$nextTick(() => {
-                    this.$router.push({ name: 'articles-index' });
                 });
             } catch (error) {
                 const { status, message } = error.response.data;
@@ -197,6 +209,10 @@ export default {
 
         setImageName(image) {
             this.form.image = image;
+        },
+
+        setPhotoData(image_data) {
+            this.form.photo.push(image_data);
         },
 
         uploadImage(e) {

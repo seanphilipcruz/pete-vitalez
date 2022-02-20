@@ -55,6 +55,8 @@ class PhotosController extends Controller
     public function show($id) {
         $photo = Photo::with('Blog', 'Product')->findOrFail($id);
 
+        $photo->image = $this->verify_photo($photo->image, 'blog');
+
         return response()->json($photo);
     }
 

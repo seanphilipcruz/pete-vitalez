@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { Cropper } from "vue-advanced-cropper";
+import  { Cropper } from "vue-advanced-cropper";
 import 'vue-advanced-cropper/dist/style.css';
 import Editor from "@tinymce/tinymce-vue";
 
@@ -112,7 +112,7 @@ export default {
     props: {
         type: {
             required: true,
-        }
+        },
     },
 
     components: {
@@ -191,10 +191,7 @@ export default {
 
                         this.reset();
 
-                        Toast.fire({
-                            'icon': res.data.status,
-                            'title': res.data.message
-                        });
+                        this.$emit('uploaded');
                     }).catch((error) => {
                         this.$refs["dismiss-button"].click();
                         this.reset();

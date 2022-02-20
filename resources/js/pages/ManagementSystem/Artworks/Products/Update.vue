@@ -11,9 +11,9 @@
             </div>
             <div v-if="artwork">
                 <div class="card mb-3">
-                    <update-form :artwork="artwork"></update-form>
+                    <update-form :artwork="artwork" :refresh="fetchArtwork"></update-form>
                 </div>
-                <gallery :photo="artwork.photo" :folder="artworksDirectory" :fallback-image="fallbackImage" :edit-mode="true" :refresh="fetchArtwork"></gallery>
+                <gallery photo_type="artwork_photo" :photo="artwork.photo" :folder="artworksDirectory" :fallback-image="fallbackImage" :edit-mode="true" :refresh="fetchArtwork"></gallery>
             </div>
         </div>
     </div>

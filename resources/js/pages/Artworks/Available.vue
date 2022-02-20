@@ -8,6 +8,7 @@
         </div>
         <div class="row mb-3">
             <div class="col-12" v-if="!artworks">
+                <filter-bar :search="webpage.search" :fields="fields" :website="webpage" @searchWebpage="searchAvailableProducts" @sortData="changeSorting" />
                 <div class="d-flex justify-content-center align-items-center">
                     <img :src="logo" alt="logo.png" class="img-fluid" width="450px" />
                     <div class="display-5 text-center my-3 text-open-sans">
@@ -113,8 +114,6 @@ export default {
 
     methods: {
         async fetchItems() {
-            this.loading = true;
-
             try {
                 const query = {
                     page: this.webpage.page,
@@ -137,8 +136,6 @@ export default {
 
                 throw error;
             }
-
-            this.loading = false;
         },
 
         async changeSorting(header) {
@@ -219,7 +216,7 @@ export default {
     watch: {
         ['webpage.search']: utilHelper.debounce(async function() {
             await this.fetchItems();
-        }, 800)
+        }, 3000)
     }
 }
 </script>

@@ -17,7 +17,7 @@
             <div class="card">
                 <div class="card-body">
                     <div id="hover-items" class="row">
-                        <div class="col-6 col-sm-6 col-md-3" v-for="pictures in $props.photo" :key="pictures.id" data-bs-target="#update-photo" data-bs-toggle="modal">
+                        <div class="col-6 col-sm-6 col-md-3 my-3" v-for="pictures in $props.photo" :key="pictures.id" data-bs-target="#update-photo" data-bs-toggle="modal">
                             <div class="card shadow" @click="fetchPhoto(pictures.id)">
                                 <img :src="folder + '/' + (pictures.image ? pictures.image : fallbackImage)" :alt="pictures.title">
                                 <div class="card-body text-center">
@@ -30,7 +30,7 @@
                 </div>
             </div>
         </div>
-        <update-photo type="artwork_photo" :photo="extra_photos" @updated="refresh()" :edit-mode="editMode" :loading-state="loading"></update-photo>
+        <update-photo :type="photo_type" :photo="extra_photos" @updated="refresh()" :edit-mode="editMode" :loading-state="loading"></update-photo>
     </div>
 </template>
 
@@ -56,6 +56,10 @@ export default {
         },
         refresh: {
             type: Function,
+            required: true,
+        },
+        photo_type: {
+            type: String,
             required: true,
         }
     },

@@ -15,6 +15,7 @@
                         </a>
                     </div>
                 </div>
+                <div>v<span class="fw-bold">{{ version }}</span></div>
                 <div>2021. &copy; All rights reserved.</div>
             </div>
         </div>
@@ -42,6 +43,10 @@ export default {
 
         content() {
             return this.$store.state.website.content;
+        },
+
+        version() {
+            return process.env.MIX_APP_VERSION;
         }
     },
 

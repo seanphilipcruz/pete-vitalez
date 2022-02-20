@@ -105,8 +105,6 @@ export default {
 
     methods: {
         async fetchItems() {
-            this.loading = true;
-
             try {
                 const query = {
                     page: this.webpage.page,
@@ -129,8 +127,6 @@ export default {
 
                 throw error;
             }
-
-            this.loading = false;
         },
 
         async changeSorting(header) {
@@ -211,7 +207,7 @@ export default {
     watch: {
         ['webpage.search']: utilHelper.debounce(async function() {
             await this.fetchItems();
-        }, 800)
+        }, 3000)
     }
 }
 </script>
