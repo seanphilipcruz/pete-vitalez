@@ -29,9 +29,9 @@ const photosModule = {
     },
 
     actions: {
-        async [GET_PHOTO]({ commit }, _id) {
+        async [GET_PHOTO]({ commit }, _request) {
             try {
-                const response = await photoService.get(_id);
+                const response = await photoService.get(_request);
 
                 const photo = response.data;
 

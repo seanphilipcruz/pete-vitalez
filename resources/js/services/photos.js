@@ -1,8 +1,12 @@
 import axios from "axios";
 
 const photoService = {
-    async get(id) {
-        const response = await axios.get(`/api/photos/view/${id}`);
+    async get(request) {
+        const response = await axios.get(`/api/photos/view/${request.id}`, {
+            params: {
+                type: request.type,
+            }
+        });
 
         return response;
     },

@@ -19,7 +19,7 @@
                     <div id="hover-items" class="row">
                         <div class="col-6 col-sm-6 col-md-3 my-3" v-for="pictures in $props.photo" :key="pictures.id" data-bs-target="#update-photo" data-bs-toggle="modal">
                             <div class="card shadow" @click="fetchPhoto(pictures.id)">
-                                <img :src="folder + '/' + (pictures.image ? pictures.image : fallbackImage)" :alt="pictures.title">
+                                <img :src="folder + '/' + (!pictures.image ? fallbackImage : pictures.image)" :alt="pictures.title">
                                 <div class="card-body text-center">
                                     <div class="card-title fw-bold">{{ pictures.title }}</div>
                                     <div class="card-text" v-html="pictures.description"></div>
@@ -78,9 +78,14 @@ export default {
         async fetchPhoto(id) {
             this.loading = true;
 
+            let request = {
+                "id": id,
+                "type": "artwork"
+            };
+
             if (this.$props.editMode) {
                 try {
-                    const response = await this.$store.dispatch(GET_PHOTO, id);
+                    const response = await this.$store.dispatch(GET_PHOTO, request);
                 } catch (error) {
                     await Popup.fire({
                         'icon': 'error',

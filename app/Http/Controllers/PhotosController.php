@@ -52,10 +52,12 @@ class PhotosController extends Controller
         ], 201);
     }
 
-    public function show($id) {
+    public function show($id, Request $request) {
         $photo = Photo::with('Blog', 'Product')->findOrFail($id);
 
-        $photo->image = $this->verify_photo($photo->image, 'blog');
+        $type = !$request['type'] ? 'blog' : 'artwork';
+
+        $photo->image = $this->verify_photo($photo->image, $type);
 
         return response()->json($photo);
     }
