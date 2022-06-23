@@ -33,7 +33,7 @@
                             </div>
                             <div class="row justify-content-center mb-3">
                                 <div class="col-6 text-center">
-                                    <button v-if="image.src" type="button" class="btn btn-outline-dark" @click="crop()">Crop</button>
+                                    <button v-if="image.src" type="button" class="btn btn-outline-dark" @click="crop()">Crop & Save</button>
                                     <button v-if="image.src" type="button" class="btn btn-outline-dark" @click="reset()">Reset</button>
                                     <button v-if="!image.src" type="button" class="btn btn-outline-dark" @click="$refs.file.click()">
                                         <input type="file" ref="file" accept="image/*" hidden @change="loadImage($event)">
